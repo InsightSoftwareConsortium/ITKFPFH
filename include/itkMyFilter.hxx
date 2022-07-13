@@ -74,16 +74,19 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputePairFeatures(const Vector3d &p
 template <typename TInputPointSet, typename TOutputPointSet>
 typename MyFilter<TInputPointSet, TOutputPointSet>::FeatureType
 MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
-        const TInputPointSet * input,
-        const TInputPointSet * input_normals,
+        TInputPointSet * input,
+        TInputPointSet * input_normals,
         unsigned int radius)
         {
     PointsLocatorTypePointer kdtree = PointsLocatorType::New();
-    //kdtree->SetPoints(input->GetPoints());
-    //kdtree->Initialize();
+    kdtree->SetPoints(input->GetPoints());
+    kdtree->Initialize();
+
+    std::cout << "KdTree is " << kdtree << std::endl;
 
     FeatureType feature;
-    feature.reserve(33 * (unsigned int)input->GetNumberOfPoints());
+    feature.resize(33 * (unsigned int)input->GetNumberOfPoints());
+    std::cout << "feature size is " << feature.size();
 
     Vector3d temp_point_vector1, temp_point_vector2;
     Vector3d temp_normal_vector1, temp_normal_vector2;
@@ -93,8 +96,12 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
         auto point = input->GetPoint(i);
         auto normal = input_normals->GetPoint(i);
 
+        //std::cout << "Point " << point << std::endl;
+
         typename PointsLocatorType::NeighborsIdentifierType indices;
         kdtree->FindPointsWithinRadius(point, radius, indices);
+
+        std::cout << i << " Number of points are " << indices.size() << std::endl;
 
         if (indices.size() > 1)
         {
@@ -156,6 +163,8 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
           }
         }
     }
+
+    std::cout << "Feature " << feature.size() << std::endl;
     return feature;
 }
 

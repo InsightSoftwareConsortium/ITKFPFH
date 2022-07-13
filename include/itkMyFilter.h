@@ -75,8 +75,8 @@ public:
   itkNewMacro(Self);
 
   FeatureType ComputeSPFHFeature(
-        const InputPointSetType * input,
-        const InputPointSetType * input_normals,
+        InputPointSetType * input,
+        InputPointSetType * input_normals,
         unsigned int radius);
 
 protected:
