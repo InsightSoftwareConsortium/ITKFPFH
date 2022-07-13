@@ -78,6 +78,11 @@ public:
         InputPointSetType * input,
         InputPointSetType * input_normals,
         unsigned int radius);
+  
+  FeatureType ComputeFPFHFeature(
+        InputPointSetType * input,
+        InputPointSetType * input_normals,
+        unsigned int radius);
 
 protected:
   MyFilter();
