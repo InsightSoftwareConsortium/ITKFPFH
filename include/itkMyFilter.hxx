@@ -100,15 +100,14 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
         typename PointsLocatorType::NeighborsIdentifierType indices;
         kdtree->FindPointsWithinRadius(point, radius, indices);
 
-        std::cout << i << " Number of points are " << indices.size() << std::endl;
-
         if (indices.size() > 1)
         {
-          std::vector< std::pair <float, int> > neighbor_vect;
+          std::vector< std::pair <double, int> > neighbor_vect;
           for (size_t k = 0; k < indices.size(); k++)
           {
             auto point_diff = point - input->GetPoint(indices[k]);
             double dist = point_diff.GetNorm();
+            dist = dist*dist;
 
             // skip the point itself
             if (dist == 0.0)
@@ -120,7 +119,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
           //std::cout << i << " Number of valid points are " << neighbor_vect.size() << std::endl;
 
           std::sort(neighbor_vect.begin(), neighbor_vect.end());
-          unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size()) -1 ;
+          unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
 
           // only compute SPFH feature when a point has neighbors
           double hist_incr = 100.0 / (double)neighbor_count;
@@ -228,7 +227,8 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
               {
                 auto point_diff = point - input->GetPoint(indices[k]);
                 double dist = point_diff.GetNorm();
-
+                dist = dist*dist;
+                
                 // skip the point itself
                 if (dist == 0.0)
                   continue;
@@ -239,7 +239,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
               std::sort(neighbor_vect.begin(), neighbor_vect.end());
 
               // Take only first neighbors
-              unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size()) - 1;
+              unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
               for (size_t k = 0; k < neighbor_count; k++)
               {
                 //std::cout << "k " << k  << "  first " <<  neighbor_vect[k].first << " second " << neighbor_vect[k].second << std::endl;
