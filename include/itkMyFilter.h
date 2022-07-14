@@ -77,12 +77,14 @@ public:
   FeatureType ComputeSPFHFeature(
         InputPointSetType * input,
         InputPointSetType * input_normals,
-        unsigned int radius);
+        unsigned int radius,
+        unsigned int neighbors);
   
   FeatureType ComputeFPFHFeature(
         InputPointSetType * input,
         InputPointSetType * input_normals,
-        unsigned int radius);
+        unsigned int radius,
+        unsigned int neighbors);
 
 protected:
   MyFilter();

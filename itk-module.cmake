@@ -15,9 +15,10 @@ itk_module(Fpfh
   DEPENDS
     ITKCommon
     ITKStatistics
+    ITKRegistrationCommon
   COMPILE_DEPENDS
     ITKStatistics
-    ITKImageSources
+    ITKRegistrationCommon
   TEST_DEPENDS
     ITKTestKernel
     ITKMetaIO
