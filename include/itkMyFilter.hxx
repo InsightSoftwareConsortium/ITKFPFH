@@ -142,7 +142,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
                                             temp_point_vector2,
                                             temp_normal_vector2);
               
-              int h_index = (int)(floor(11 * (pair_feature[0] + M_PI) / (2.0 * M_PI)));
+              int h_index = (int)(floor(11 * (pair_feature[0] + itk::Math::pi) / (2.0 * itk::Math::pi)));
               if (h_index < 0)
               {
                 h_index = 0;
