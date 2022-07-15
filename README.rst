@@ -2,7 +2,7 @@ ITKFpfh
 =================================
 
 .. image:: https://github.com/PranjalSahu/Fpfh.git/actions/workflows/build-test-package.yml/badge.svg
-    :target: https://github.com/PranjalSahu/Fpfh.git/actions/workflows/build-test-package.yml
+    :target: https://github.com/PranjalSahu/Fpfh.git/actions/workflows/build-test-package.yml/badge.svg
     :alt: Build Status
 
 .. image:: https://img.shields.io/pypi/v/itk-fpfh.svg
