@@ -72,7 +72,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputePairFeatures(const Vector3d &p
 }
 
 template <typename TInputPointSet, typename TOutputPointSet>
-typename MyFilter<TInputPointSet, TOutputPointSet>::FeatureType
+typename MyFilter<TInputPointSet, TOutputPointSet>::FeatureType *
 MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
         TInputPointSet * input,
         TInputPointSet * input_normals,
@@ -84,8 +84,10 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
     kdtree->Initialize();
 
     unsigned long int num_of_points = input->GetNumberOfPoints();
-    FeatureType feature;
-    feature.resize(33 * num_of_points);
+    FeatureType * feature = FeatureType::New();
+    //feature.resize(33 * num_of_points);
+    feature->Reserve(33 * num_of_points);
+
     
     Vector3d temp_point_vector1, temp_point_vector2;
     Vector3d temp_normal_vector1, temp_normal_vector2;
@@ -152,7 +154,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
                 h_index = 10;
               }
               unsigned int temp_index = h_index*num_of_points + i;
-              feature[temp_index] =  hist_incr + feature[temp_index];
+              feature->SetElement(temp_index, hist_incr + feature->GetElement(temp_index));
 
               h_index = (int)(floor(11 * (pair_feature[1] + 1.0) * 0.5));
               if (h_index < 0)
@@ -164,7 +166,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
                 h_index = 10;
               }
               temp_index = (h_index + 11)*num_of_points + i;
-              feature[temp_index] =  hist_incr + feature[temp_index];
+              feature->SetElement(temp_index, hist_incr + feature->GetElement(temp_index));
               
               h_index = (int)(floor(11 * (pair_feature[2] + 1.0) * 0.5));
               if (h_index < 0)
@@ -176,17 +178,17 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
                 h_index = 10;
               }
               temp_index = (h_index + 22)*num_of_points + i;
-              feature[temp_index]  = hist_incr + feature[temp_index];
+              feature->SetElement(temp_index, hist_incr + feature->GetElement(temp_index));
           }
         }
     }
 
-    std::cout << "Feature " << feature.size() << std::endl;
+    //std::cout << "Feature " << feature.size() << std::endl;
     return feature;
 }
 
 template <typename TInputPointSet, typename TOutputPointSet>
-typename MyFilter<TInputPointSet, TOutputPointSet>::FeatureType
+typename MyFilter<TInputPointSet, TOutputPointSet>::FeatureType *
 MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         TInputPointSet * input,
         TInputPointSet * input_normals,
@@ -195,8 +197,8 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         {
           unsigned long int num_of_points = input->GetNumberOfPoints();
 
-          FeatureType feature;
-          feature.resize(33 * num_of_points);
+          FeatureType * feature = FeatureType::New();
+          feature->Reserve(33 * num_of_points);
     
         // if (!input.HasNormals()) {
         //     utility::LogError("Failed because input point cloud has no normal.");
@@ -238,16 +240,15 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
 
               std::sort(neighbor_vect.begin(), neighbor_vect.end());
 
-              // Take only first neighbors
+              // Take only first neighbors in sorted order
               unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
               for (size_t k = 0; k < neighbor_count; k++)
               {
-                //std::cout << "k " << k  << "  first " <<  neighbor_vect[k].first << " second " << neighbor_vect[k].second << std::endl;
                   for (int j = 0; j < 33; j++)
                   {
-                      double val = spfh[j*num_of_points + neighbor_vect[k].second] / neighbor_vect[k].first;
+                      double val = spfh->GetElement(j*num_of_points + neighbor_vect[k].second) / neighbor_vect[k].first;
                       sum[j / 11] += val;
-                      feature[j*num_of_points + i] = feature[j*num_of_points + i] + val;
+                      feature->SetElement(j*num_of_points + i, feature->GetElement(j*num_of_points + i) + val);
                   }
               }
 
@@ -261,13 +262,8 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
 
               for (int j = 0; j < 33; j++)
               {
-                  feature[j*num_of_points + i] = feature[j*num_of_points + i] * sum[j / 11];
-                  // The commented line is the fpfh function in the paper.
-                  // But according to PCL implementation, it is skipped.
-                  // Our initial test shows that the full fpfh function in the
-                  // paper seems to be better than PCL implementation. Further
-                  // test required.
-                  feature[j*num_of_points + i] = feature[j*num_of_points + i] + spfh[j*num_of_points + i];
+                  feature->SetElement(j*num_of_points + i, feature->GetElement(j*num_of_points + i) * sum[j / 11]);
+                  feature->SetElement(j*num_of_points + i, feature->GetElement(j*num_of_points + i) + spfh->GetElement(j*num_of_points + i));
               }
         }
     }
