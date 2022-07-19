@@ -19,7 +19,7 @@ Sample Usage is shown below:
 # fpfh_feature is numpy array of shape [Nx33]
 
 normal_pointset.SetPoints(itk.vector_container_from_array(normal_np.flatten()))
-fpfh = itk.Fpfh.MyFilter.MF3MF3.New()
+fpfh = itk.Fpfh.PointFeature.MF3MF3.New()
 fpfh.ComputeFPFHFeature(pointset, normal_pointset, 25, 100)
 fpfh_feature = fpfh.GetFpfhFeature()
 fpfh_feature = itk.array_from_vector_container(fpfh_feature)
