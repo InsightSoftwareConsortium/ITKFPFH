@@ -67,6 +67,7 @@ public:
   using PointsLocatorTypePointer = typename PointsLocatorType::Pointer;
   //using FeatureType = std::vector<double>;
   using FeatureType = typename itk::VectorContainer<PointIdentifier, double>;
+  using FeatureTypePointer = typename FeatureType::Pointer;
 
   /** Run-time type information. */
   itkTypeMacro(MyFilter, MeshToMeshFilter);
@@ -74,19 +75,13 @@ public:
   /** Standard New macro. */
   itkNewMacro(Self);
 
-  FeatureType * ComputeSPFHFeature(
+  itkGetConstObjectMacro(FpfhFeature, FeatureType);
+  
+  void ComputeFPFHFeature(
         InputPointSetType * input,
         InputPointSetType * input_normals,
         unsigned int radius,
         unsigned int neighbors);
-  
-  FeatureType * ComputeFPFHFeature(
-        InputPointSetType * input,
-        InputPointSetType * input_normals,
-        unsigned int radius,
-        unsigned int neighbors);
-  
-  FeatureType * fpfh_feature;
 
 protected:
   MyFilter();
@@ -100,11 +95,17 @@ protected:
                                            const Vector3d &p2,
                                            const Vector3d &n2);
 
-  
+   FeatureTypePointer ComputeSPFHFeature(
+        InputPointSetType * input,
+        InputPointSetType * input_normals,
+        unsigned int radius,
+        unsigned int neighbors);
+   
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
 private:
+  FeatureTypePointer m_FpfhFeature;
 #ifdef ITK_USE_CONCEPT_CHECKING
   // Add concept checking such as
   // itkConceptMacro( FloatingPointPixel, ( itk::Concept::IsFloatingPoint< typename InputImageType::PixelType > ) );
