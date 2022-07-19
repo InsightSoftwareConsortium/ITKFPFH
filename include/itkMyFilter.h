@@ -94,13 +94,13 @@ protected:
                                            const Vector3d &n1,
                                            const Vector3d &p2,
                                            const Vector3d &n2);
-
+  
    FeatureTypePointer ComputeSPFHFeature(
         InputPointSetType * input,
         InputPointSetType * input_normals,
         unsigned int radius,
         unsigned int neighbors);
-   
+  
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 

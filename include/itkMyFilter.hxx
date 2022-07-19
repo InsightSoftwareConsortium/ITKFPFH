@@ -84,7 +84,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
     kdtree->Initialize();
 
     unsigned long int num_of_points = input->GetNumberOfPoints();
-    FeatureType * feature = FeatureType::New();
+    auto feature = FeatureType::New();
     //feature.resize(33 * num_of_points);
     feature->Reserve(33 * num_of_points);
 
@@ -96,9 +96,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
     {
         auto point = input->GetPoint(i);
         auto normal = input_normals->GetPoint(i);
-
-        std::cout << "Point " << point << std::endl;
-
+        
         typename PointsLocatorType::NeighborsIdentifierType indices;
         kdtree->FindPointsWithinRadius(point, radius, indices);
 
