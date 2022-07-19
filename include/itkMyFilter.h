@@ -85,6 +85,8 @@ public:
         InputPointSetType * input_normals,
         unsigned int radius,
         unsigned int neighbors);
+  
+  FeatureType * fpfh_feature;
 
 protected:
   MyFilter();
