@@ -1,14 +1,14 @@
 itk_module_test()
 
 set(FpfhTests
-  itkMyFilterTest.cxx
+  itkPointFeatureTest.cxx
   )
 
 CreateTestDriver(Fpfh "${Fpfh-Test_LIBRARIES}" "${FpfhTests}")
 
 
-itk_add_test(NAME itkMyFilterTest
+itk_add_test(NAME itkPointFeatureTest
   COMMAND FpfhTestDriver
-  itkMyFilterTest
-    ${ITK_TEST_OUTPUT_DIR}/itkMyFilterTestOutput.mha
+  itkPointFeatureTest
+    ${ITK_TEST_OUTPUT_DIR}/itkPointFeatureTestOutput.mha
   )
