@@ -1,7 +1,7 @@
 ITKFpfh
 =================================
 
-[<img src="https://github.com/PranjalSahu/Fpfh.git/actions/workflows/build-test-package.yml/badge.svg">](https://github.com/PranjalSahu/Fpfh/actions)
+[<img src="https://github.com/PranjalSahu/Fpfh/actions/workflows/build-test-package.yml/badge.svg">](https://github.com/PranjalSahu/Fpfh/actions)
 [<img src="https://img.shields.io/pypi/v/itk-fpfh.svg">](https://pypi.python.org/pypi/itk-fpfh)
 
 
