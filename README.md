@@ -7,6 +7,9 @@ ITKFpfh
 
 Overview
 --------
+<p align="center">
+<img src="https://user-images.githubusercontent.com/1044135/180022085-0e230afa-a5df-4afe-86b5-29543a2e1823.png" width="400" height="400" />
+</p>
 
 Module to calculate FPFH feature for a pointset.
 Sample Usage is shown below:
