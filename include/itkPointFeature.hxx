@@ -21,6 +21,7 @@
 
 #include "math.h"
 #include "itkPointFeature.h"
+#include "itkMultiThreaderBase.h"
 
 namespace itk
 {
@@ -196,10 +197,7 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
           unsigned long int num_of_points = input->GetNumberOfPoints();
           this->m_FpfhFeature = FeatureType::New();
           this->m_FpfhFeature->Reserve(33 * num_of_points);
-    
-        // if (!input.HasNormals()) {
-        //     utility::LogError("Failed because input point cloud has no normal.");
-        // }
+        
           PointsLocatorTypePointer kdtree = PointsLocatorType::New();
           kdtree->SetPoints(input->GetPoints());
           kdtree->Initialize();
@@ -210,61 +208,65 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
           // }
 // #pragma omp parallel for schedule(static) \
 //         num_threads(utility::EstimateMaxThreads())
-        for (int i = 0; i < num_of_points; i++)
+        //for (int i = 0; i < num_of_points; i++)
+        auto process_point =  [&] (int i)
         {
-            auto point = input->GetPoint(i);
-            
-            typename PointsLocatorType::NeighborsIdentifierType indices;
-            kdtree->FindPointsWithinRadius(point, radius, indices);
+          auto point = input->GetPoint(i);
+          
+          typename PointsLocatorType::NeighborsIdentifierType indices;
+          kdtree->FindPointsWithinRadius(point, radius, indices);
 
-            if (indices.size() > 1)
+          if (indices.size() > 1)
+          {
+            double sum[3] = {0.0, 0.0, 0.0};
+
+            std::vector< std::pair <float, int> > neighbor_vect;
+            for (size_t k = 0; k < indices.size(); k++)
             {
-              double sum[3] = {0.0, 0.0, 0.0};
+              auto point_diff = point - input->GetPoint(indices[k]);
+              double dist = point_diff.GetNorm();
+              dist = dist*dist;
+              
+              // skip the point itself
+              if (dist == 0.0)
+                continue;
+              
+              neighbor_vect.push_back( std::make_pair(dist, indices[k]) );
+            }
 
-              std::vector< std::pair <float, int> > neighbor_vect;
-              for (size_t k = 0; k < indices.size(); k++)
-              {
-                auto point_diff = point - input->GetPoint(indices[k]);
-                double dist = point_diff.GetNorm();
-                dist = dist*dist;
-                
-                // skip the point itself
-                if (dist == 0.0)
-                  continue;
-                
-                neighbor_vect.push_back( std::make_pair(dist, indices[k]) );
-              }
+            std::sort(neighbor_vect.begin(), neighbor_vect.end());
 
-              std::sort(neighbor_vect.begin(), neighbor_vect.end());
+            // Take only first neighbors in sorted order
+            unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
+            for (size_t k = 0; k < neighbor_count; k++)
+            {
+                for (int j = 0; j < 33; j++)
+                {
+                    double val = spfh->GetElement(j*num_of_points + neighbor_vect[k].second) / neighbor_vect[k].first;
+                    sum[j / 11] += val;
+                    this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) + val);
+                }
+            }
 
-              // Take only first neighbors in sorted order
-              unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
-              for (size_t k = 0; k < neighbor_count; k++)
-              {
-                  for (int j = 0; j < 33; j++)
-                  {
-                      double val = spfh->GetElement(j*num_of_points + neighbor_vect[k].second) / neighbor_vect[k].first;
-                      sum[j / 11] += val;
-                      this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) + val);
-                  }
-              }
+            for (int j = 0; j < 3; j++)
+            {
+                if (sum[j] != 0.0)
+                {
+                  sum[j] = 100.0 / sum[j];
+                }
+            }
 
-              for (int j = 0; j < 3; j++)
-              {
-                  if (sum[j] != 0.0)
-                  {
-                    sum[j] = 100.0 / sum[j];
-                  }
-              }
+            for (int j = 0; j < 33; j++)
+            {
+                this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) * sum[j / 11]);
+                this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) + spfh->GetElement(j*num_of_points + i));
+            }
+          }
+        };
 
-              for (int j = 0; j < 33; j++)
-              {
-                  this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) * sum[j / 11]);
-                  this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) + spfh->GetElement(j*num_of_points + i));
-              }
-        }
+        itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
+        mt->ParallelizeArray(0, num_of_points, process_point, nullptr);
     }
-}
 
 
 template <typename TInputPointSet, typename TOutputPointSet>
