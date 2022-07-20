@@ -14,22 +14,23 @@ Overview
 Module to calculate FPFH feature for a pointset.
 Sample Usage is shown below:
 
-```
+```python
 # normal_pointset is ITK Pointset which contains normal vector for each point
 # pointset is ITK Pointset which contains the input points for which feature needs to be calculated
 
 # normal_np is numpy array of shape [Nx3]
-# fpfh_feature is numpy array of shape [Nx33]
+# fpfh_feature is numpy array of shape [33xN]
 
 normal_pointset.SetPoints(itk.vector_container_from_array(normal_np.flatten()))
 fpfh = itk.Fpfh.PointFeature.MF3MF3.New()
 fpfh.ComputeFPFHFeature(pointset, normal_pointset, 25, 100)
 fpfh_feature = fpfh.GetFpfhFeature()
 fpfh_feature = itk.array_from_vector_container(fpfh_feature)
+fpfh_feature = np.reshape(fpfh_feature, [33, pointset.GetNumberOfPoints()])
 ```
 
 One can obtain the normals using the following code:
-```
+```python
 def getnormals_pca(inputPoints):
     import vtk
     from vtk.util import numpy_support
