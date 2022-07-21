@@ -22,6 +22,9 @@ Sample Usage is shown below:
 # fpfh_feature is numpy array of shape [33xN]
 # 25 is the radius and 100 is the maximum number of neighbors
 
+pointset = itk.PointSet[itk.F, 3].New()
+normal_pointset = itk.PointSet[itk.F, 3].New()
+
 normal_pointset.SetPoints(itk.vector_container_from_array(normal_np.flatten()))
 fpfh = itk.Fpfh.PointFeature.MF3MF3.New()
 fpfh.ComputeFPFHFeature(pointset, normal_pointset, 25, 100)
