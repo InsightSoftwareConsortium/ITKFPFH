@@ -21,6 +21,7 @@
 
 #include "math.h"
 #include "itkMyFilter.h"
+#include "itkMultiThreaderBase.h"
 
 namespace itk
 {
@@ -84,21 +85,17 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
     kdtree->Initialize();
 
     unsigned long int num_of_points = input->GetNumberOfPoints();
-    FeatureType feature;
-    feature.resize(33 * num_of_points);
+    FeatureType feature(33 * num_of_points, 0);
+    //feature.resize(33 * num_of_points);
     
-    Vector3d temp_point_vector1, temp_point_vector2;
-    Vector3d temp_normal_vector1, temp_normal_vector2;
-
-    for (int i = 0; i < num_of_points; i++)
+    auto process_point = [&] (int i)
     {
         auto point = input->GetPoint(i);
         auto normal = input_normals->GetPoint(i);
 
-        std::cout << "Point " << point << std::endl;
-
         typename PointsLocatorType::NeighborsIdentifierType indices;
-        kdtree->FindPointsWithinRadius(point, radius, indices);
+        //kdtree->FindPointsWithinRadius(point, radius, indices);
+        kdtree->FindClosestNPoints(point, neighbors, indices);
 
         if (indices.size() > 1)
         {
@@ -118,7 +115,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
 
           //std::cout << i << " Number of valid points are " << neighbor_vect.size() << std::endl;
 
-          std::sort(neighbor_vect.begin(), neighbor_vect.end());
+          //std::sort(neighbor_vect.begin(), neighbor_vect.end());
           unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
 
           // only compute SPFH feature when a point has neighbors
@@ -128,6 +125,9 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
               //std::cout << "Point " << k << " is " <<  neighbor_vect[k].second << std::endl;
               auto point2 = input->GetPoint(neighbor_vect[k].second);
               auto normal2 = input_normals->GetPoint(neighbor_vect[k].second);
+
+              Vector3d temp_point_vector1, temp_point_vector2;
+              Vector3d temp_normal_vector1, temp_normal_vector2;
 
               // skip the point itself, compute histogram
               for (int ik = 0; ik < 3; ++ik)
@@ -179,9 +179,10 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
               feature[temp_index]  = hist_incr + feature[temp_index];
           }
         }
-    }
+    };
 
-    std::cout << "Feature " << feature.size() << std::endl;
+    itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
+    mt->ParallelizeArray(0, num_of_points, process_point, nullptr);
     return feature;
 }
 
@@ -195,8 +196,8 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         {
           unsigned long int num_of_points = input->GetNumberOfPoints();
 
-          FeatureType feature;
-          feature.resize(33 * num_of_points);
+          FeatureType feature(33 * num_of_points, 0);
+          //feature.resize(33 * num_of_points);
     
         // if (!input.HasNormals()) {
         //     utility::LogError("Failed because input point cloud has no normal.");
@@ -211,12 +212,12 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
           // }
 // #pragma omp parallel for schedule(static) \
 //         num_threads(utility::EstimateMaxThreads())
-        for (int i = 0; i < num_of_points; i++)
+        auto process_point = [&] (int i)
         {
             auto point = input->GetPoint(i);
             
             typename PointsLocatorType::NeighborsIdentifierType indices;
-            kdtree->FindPointsWithinRadius(point, radius, indices);
+            kdtree->FindClosestNPoints(point, neighbors, indices);
 
             if (indices.size() > 1)
             {
@@ -236,7 +237,7 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
                 neighbor_vect.push_back( std::make_pair(dist, indices[k]) );
               }
 
-              std::sort(neighbor_vect.begin(), neighbor_vect.end());
+              //std::sort(neighbor_vect.begin(), neighbor_vect.end());
 
               // Take only first neighbors
               unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
@@ -270,7 +271,11 @@ MyFilter<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
                   feature[j*num_of_points + i] = feature[j*num_of_points + i] + spfh[j*num_of_points + i];
               }
         }
-    }
+    };
+
+    itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
+    mt->ParallelizeArray(0, num_of_points, process_point, nullptr);
+
     return feature;
 }
 
