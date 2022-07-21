@@ -89,21 +89,20 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
     //feature.resize(33 * num_of_points);
     feature->Reserve(33 * num_of_points);
 
-    
-    Vector3d temp_point_vector1, temp_point_vector2;
-    Vector3d temp_normal_vector1, temp_normal_vector2;
-
-    for (int i = 0; i < num_of_points; i++)
+    auto ProcessPoint =  [&] (int i)
     {
         auto point = input->GetPoint(i);
         auto normal = input_normals->GetPoint(i);
         
         typename PointsLocatorType::NeighborsIdentifierType indices;
-        kdtree->FindPointsWithinRadius(point, radius, indices);
+        //kdtree->FindPointsWithinRadius(point, radius, indices);
+        kdtree->FindClosestNPoints(point, neighbors, indices);
 
         if (indices.size() > 1)
         {
           std::vector< std::pair <double, int> > neighbor_vect;
+          neighbor_vect.reserve(indices.size());
+
           for (size_t k = 0; k < indices.size(); k++)
           {
             auto point_diff = point - input->GetPoint(indices[k]);
@@ -117,9 +116,7 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
             neighbor_vect.push_back( std::make_pair(dist, indices[k]) );
           }
 
-          //std::cout << i << " Number of valid points are " << neighbor_vect.size() << std::endl;
-
-          std::sort(neighbor_vect.begin(), neighbor_vect.end());
+          //std::sort(neighbor_vect.begin(), neighbor_vect.end());
           unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
 
           // only compute SPFH feature when a point has neighbors
@@ -129,6 +126,9 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
               //std::cout << "Point " << k << " is " <<  neighbor_vect[k].second << std::endl;
               auto point2 = input->GetPoint(neighbor_vect[k].second);
               auto normal2 = input_normals->GetPoint(neighbor_vect[k].second);
+
+              Vector3d temp_point_vector1, temp_point_vector2;
+              Vector3d temp_normal_vector1, temp_normal_vector2;
 
               // skip the point itself, compute histogram
               for (int ik = 0; ik < 3; ++ik)
@@ -180,9 +180,10 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
               feature->SetElement(temp_index, hist_incr + feature->GetElement(temp_index));
           }
         }
-    }
+    };
 
-    //std::cout << "Feature " << feature.size() << std::endl;
+    itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
+    mt->ParallelizeArray(0, num_of_points, ProcessPoint, nullptr);
     return feature;
 }
 
@@ -202,21 +203,25 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         kdtree->SetPoints(input->GetPoints());
         kdtree->Initialize();
 
+        std::cout << "Before SPFH Feature calculation " << std::time(0) <<  std::endl;
         auto spfh = ComputeSPFHFeature(input, input_normals, radius, neighbors);
-        
+        std::cout << "After SPFH Feature calculation " << std::time(0) << std::endl;
+
         // Method to perform processing in parallel
         auto ProcessPoint =  [&] (int i)
         {
           auto point = input->GetPoint(i);
           
           typename PointsLocatorType::NeighborsIdentifierType indices;
-          kdtree->FindPointsWithinRadius(point, radius, indices);
+          kdtree->FindClosestNPoints(point, neighbors, indices);
 
           if (indices.size() > 1)
           {
             double sum[3] = {0.0, 0.0, 0.0};
 
             std::vector< std::pair <float, int> > neighbor_vect;
+            neighbor_vect.reserve(indices.size());
+
             for (size_t k = 0; k < indices.size(); k++)
             {
               auto point_diff = point - input->GetPoint(indices[k]);
@@ -230,7 +235,7 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
               neighbor_vect.push_back( std::make_pair(dist, indices[k]) );
             }
 
-            std::sort(neighbor_vect.begin(), neighbor_vect.end());
+            //std::sort(neighbor_vect.begin(), neighbor_vect.end());
 
             // Take only first neighbors in sorted order
             unsigned int neighbor_count = std::min(neighbors, (unsigned int)neighbor_vect.size());
@@ -254,14 +259,17 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
 
             for (int j = 0; j < 33; j++)
             {
-                this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) * sum[j / 11]);
-                this->m_FpfhFeature->SetElement(j*num_of_points + i, this->m_FpfhFeature->GetElement(j*num_of_points + i) + spfh->GetElement(j*num_of_points + i));
+                auto temp = this->m_FpfhFeature->GetElement(j*num_of_points + i);
+                this->m_FpfhFeature->SetElement(j*num_of_points + i, temp * sum[j / 11]);
+                this->m_FpfhFeature->SetElement(j*num_of_points + i, temp * sum[j / 11] + spfh->GetElement(j*num_of_points + i));
             }
           }
         };
 
         itk::MultiThreaderBase::Pointer mt = itk::MultiThreaderBase::New();
         mt->ParallelizeArray(0, num_of_points, ProcessPoint, nullptr);
+
+        std::cout << "After FPFH Feature calculation " << std::time(0) << std::endl;
     }
 
 
