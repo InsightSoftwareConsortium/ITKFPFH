@@ -1,4 +1,4 @@
-ITKFpfh
+ITKFPFH
 =================================
 
 [<img src="https://github.com/PranjalSahu/Fpfh/actions/workflows/build-test-package.yml/badge.svg">](https://github.com/PranjalSahu/Fpfh/actions)
