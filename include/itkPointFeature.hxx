@@ -204,10 +204,8 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         kdtree->SetPoints(input->GetPoints());
         kdtree->Initialize();
 
-        std::cout << "Before SPFH Feature calculation " << std::time(0) <<  std::endl;
         auto spfh = ComputeSPFHFeature(input, input_normals, radius, neighbors);
-        std::cout << "After SPFH Feature calculation " << std::time(0) << std::endl;
-
+        
         auto & spfh1 = spfh->CastToSTLContainer(); 
 
         // Method to perform processing in parallel
@@ -275,7 +273,6 @@ PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         // This is done to optimize the code by avoiding GetElement, SetElement overhead.
         this->m_FpfhFeature = FeatureType::New();
         this->m_FpfhFeature->CastToSTLContainer() = fpfh2;
-        std::cout << "After SPFH Feature calculation " << std::time(0) << std::endl;
     }
 
 
