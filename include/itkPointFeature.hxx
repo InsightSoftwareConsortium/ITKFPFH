@@ -77,7 +77,7 @@ typename PointFeature<TInputPointSet, TOutputPointSet>::FeatureTypePointer
 PointFeature<TInputPointSet, TOutputPointSet>::ComputeSPFHFeature(
         TInputPointSet * input,
         TInputPointSet * input_normals,
-        unsigned int radius,
+        double radius,
         unsigned int neighbors)
         {
     PointsLocatorTypePointer kdtree = PointsLocatorType::New();
@@ -194,7 +194,7 @@ void
 PointFeature<TInputPointSet, TOutputPointSet>::ComputeFPFHFeature(
         TInputPointSet * input,
         TInputPointSet * input_normals,
-        unsigned int radius, 
+        double radius,
         unsigned int neighbors)
       {
         unsigned long int num_of_points = input->GetNumberOfPoints();
