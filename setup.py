@@ -18,8 +18,8 @@ setup(
     packages=['itk'],
     package_dir={'itk': 'itk'},
     download_url=r'https://github.com/PranjalSahu/Fpfh.git',
-    description=r'This is a template that serves as a starting point for a new module.',
-    long_description='ITK is an open-source, cross-platform library that provides developers with an extensive suite of software tools for image analysis. Developed through extreme programming methodologies, ITK employs leading-edge algorithms for registering and segmenting multidimensional scientific images.',
+    description=r'An ITK-based implementation of FPFH (Fast Point Feature Histogram) used for point cloud feature calculation.',
+    long_description='The feature points could be used obtain salient points while performing registration using RANSAC remote module. The class PointFeature is the main driver that takes a PointSet as argument. Please refer to the documentation for a detailed description and sample usage: https://github.com/InsightSoftwareConsortium/ITKFPFH',
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
