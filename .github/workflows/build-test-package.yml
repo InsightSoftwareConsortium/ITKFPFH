@@ -3,8 +3,8 @@ name: test
 on: [push,pull_request]
 
 env:
-  itk-git-tag: "28325d921a9b8793e6aaefd612f53989f951d19c"
-  itk-wheel-tag: "v5.3rc04.post2"
+  itk-git-tag: "bbf14ddfb6e7d803e8dbf56550464b77714547af"
+  itk-wheel-tag: "v5.3rc04.post3"
 
 jobs:
   build-test-cxx:
