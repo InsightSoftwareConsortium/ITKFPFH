@@ -14,10 +14,7 @@ file(READ "${MY_CURRENT_DIR}/README.md" DOCUMENTATION)
 itk_module(Fpfh
   DEPENDS
     ITKCommon
-    ITKStatistics
-    ITKRegistrationCommon
   COMPILE_DEPENDS
-    ITKStatistics
     ITKRegistrationCommon
   TEST_DEPENDS
     ITKTestKernel
