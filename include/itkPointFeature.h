@@ -65,7 +65,7 @@ public:
 
   using PointsLocatorType = typename itk::PointsLocator<itk::VectorContainer<PointIdentifier, PointType>>;
   using PointsLocatorTypePointer = typename PointsLocatorType::Pointer;
-  //using FeatureType = std::vector<double>;
+  // using FeatureType = std::vector<double>;
   using FeatureType = typename itk::VectorContainer<PointIdentifier, double>;
   using FeatureTypePointer = typename FeatureType::Pointer;
 
@@ -76,12 +76,12 @@ public:
   itkNewMacro(Self);
 
   itkGetConstObjectMacro(FpfhFeature, FeatureType);
-  
-  void ComputeFPFHFeature(
-        InputPointSetType * input,
-        InputPointSetType * input_normals,
-        double radius,
-        unsigned int neighbors);
+
+  void
+  ComputeFPFHFeature(InputPointSetType * input,
+                     InputPointSetType * input_normals,
+                     double              radius,
+                     unsigned int        neighbors);
 
 protected:
   PointFeature();
@@ -90,17 +90,15 @@ protected:
   void
   GenerateData() override;
 
-  Vector4d ComputePairFeatures(const Vector3d &p1,
-                                           const Vector3d &n1,
-                                           const Vector3d &p2,
-                                           const Vector3d &n2);
-  
-   FeatureTypePointer ComputeSPFHFeature(
-        InputPointSetType * input,
-        InputPointSetType * input_normals,
-        double radius,
-        unsigned int neighbors);
-  
+  Vector4d
+  ComputePairFeatures(const Vector3d & p1, const Vector3d & n1, const Vector3d & p2, const Vector3d & n2);
+
+  FeatureTypePointer
+  ComputeSPFHFeature(InputPointSetType * input,
+                     InputPointSetType * input_normals,
+                     double              radius,
+                     unsigned int        neighbors);
+
   void
   PrintSelf(std::ostream & os, Indent indent) const override;
 
