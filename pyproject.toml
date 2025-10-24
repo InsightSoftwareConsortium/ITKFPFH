@@ -4,12 +4,13 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "itk-fpfh"
-version = "0.2.0"
+version = "0.2.1"
 description = "The feature points could be used obtain salient points while performing registration using RANSAC remote module. The class PointFeature is the main driver that takes a PointSet as argument. Please refer to the documentation for a detailed description and sample usage: https://github.com/InsightSoftwareConsortium/ITKFPFH"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
     { name = "Pranjal Sahu", email = "pranjalsahu5@gmail.com" },
+    { name = "Dženan Zukić", email = "dzenan.zukic@kitware.com" },
 ]
 keywords = [
     "itk",
@@ -33,7 +34,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
     "Topic :: Software Development :: Libraries",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "itk == 5.4.*",
 ]
