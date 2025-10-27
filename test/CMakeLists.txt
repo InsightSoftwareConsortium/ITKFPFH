@@ -10,5 +10,5 @@ CreateTestDriver(Fpfh "${Fpfh-Test_LIBRARIES}" "${FpfhTests}")
 itk_add_test(NAME itkPointFeatureTest
   COMMAND FpfhTestDriver
   itkPointFeatureTest
-    ${ITK_TEST_OUTPUT_DIR}/itkPointFeatureTestOutput.mha
+    DATA{Input/WSB_subsampled.vtk}
   )
