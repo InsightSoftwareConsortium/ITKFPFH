@@ -1,12 +1,18 @@
 name: Build, test, package
 
-on: [push,pull_request]
+on:
+  #  workflow_dispatch:
+  #    inputs:
+  #      ITKRemoteModuleBuildTestPackageActionTag:
+  #        description: "Action Tag or SHA"
+  #        required: false
+  #        default: "v5.4.4"
 
 jobs:
   cxx-build-workflow:
-    uses: InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-cxx.yml@v5.4.4
+    uses: "InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-cxx.yml@main"
 
   python-build-workflow:
-    uses: InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-package-python.yml@v5.4.4
+    uses: "InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-package-python.yml@main"
     secrets:
       pypi_password: ${{ secrets.pypi_password }}
