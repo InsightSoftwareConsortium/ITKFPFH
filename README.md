@@ -1,3 +1,17 @@
+# Migrated to ITK main
+
+The `FPFH` module has been ingested into the Insight Toolkit (ITK) main repository and is no longer maintained here.
+
+- **In-tree location:** [`Modules/Registration/FPFH`](https://github.com/InsightSoftwareConsortium/ITK/tree/main/Modules/Registration/FPFH)
+- **Ingest PR:** [InsightSoftwareConsortium/ITK#6360](https://github.com/InsightSoftwareConsortium/ITK/pull/6360)
+- **Merge commit:** [`06172c1ec4`](https://github.com/InsightSoftwareConsortium/ITK/commit/06172c1ec44657c165d3c3d0a94562c14a5be08a)
+
+Future development, bug fixes, and pull requests should target ITK main. This repository's history is preserved for `git blame` and archival reference.
+
+**Maintainer action:** this repository is **Archived** (read-only). See the [ITK ingestion strategy](https://github.com/InsightSoftwareConsortium/ITK/blob/main/Utilities/Maintenance/RemoteModuleIngest/INGESTION_STRATEGY.md) for context.
+
+---
+
 ITKFPFH
 =================================
 
